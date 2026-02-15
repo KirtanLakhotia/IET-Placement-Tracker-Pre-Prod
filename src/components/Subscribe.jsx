@@ -26,7 +26,7 @@ export default function Subscribe() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user_id: storedUser.sub,
+            sub: storedUser.sub,
             company_id: id,
             subscription_type: type,
           }),
