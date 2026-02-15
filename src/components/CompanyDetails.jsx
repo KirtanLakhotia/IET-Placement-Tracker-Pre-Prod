@@ -9,7 +9,7 @@ export default function CompanyDetails() {
     (item) => String(item.id) === String(id)
   );
 
-  const checkSubscriptionAndNavigate = async () => {
+  const checkSubscriptionAndNavigate_PYQ = async () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
 
     if (!storedUser) {
@@ -36,7 +36,41 @@ export default function CompanyDetails() {
       if (data.subscribed_status_pyq) {
         navigate(`/company/${company.id}/pyq`);
       } else {
-        navigate("/subscribe");
+        navigate(`/subscribe/${company.id}/pyq`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+   const checkSubscriptionAndNavigate_Call = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (!storedUser) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/subscribed_status_pyq",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sub: String(storedUser.sub),
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Subscription status:", data.subscribed_status_call);
+      if (data.subscribed_status_call) {
+        navigate(`/company/${company.id}/call`);
+      } else {
+        navigate(`/subscribe/${company.id}/call`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -68,14 +102,14 @@ export default function CompanyDetails() {
 
         <div className="flex gap-4">
           <button
-            onClick={checkSubscriptionAndNavigate}
+            onClick={checkSubscriptionAndNavigate_PYQ}
             className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md transition"
           >
             PYQ
           </button>
 
           <button
-            onClick={() => navigate(`/company/${company.id}/call`)}
+            onClick={checkSubscriptionAndNavigate_Call}
             className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-md transition"
           >
             1:1 Call
