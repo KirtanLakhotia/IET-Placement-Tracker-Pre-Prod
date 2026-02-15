@@ -90,8 +90,95 @@ app.post("/api/subscribed_status_call", async (req, res) => {
   }
 });
 
+app.post("/api/makeSubscription", async (req, res) => {
+  const {
+    sub,
+    company_id,
+    subscription_type,
+    transaction_id
+  } = req.body;
 
+  try {
+    const userResult = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
+    );
 
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user_id = userResult.rows[0].user_id;
+    // 1️⃣ Check if already subscribed
+    const existingSubscription = await pool.query(
+      `SELECT id FROM user_subscriptions 
+       WHERE user_id = $1 
+       AND company_id = $2 
+       AND subscription_type = $3`,
+      [user_id, company_id, subscription_type]
+    );
+
+    if (existingSubscription.rows.length > 0) {
+      console.log("User already subscribed to this company");
+      return res.json({ message: "Already subscribed" });
+    }
+
+    // 2️⃣ Insert new subscription
+    await pool.query(
+      `INSERT INTO user_subscriptions
+      (user_id, company_id, subscription_type, transaction_id)
+      VALUES ($1, $2, $3, $4)`,
+      [user_id, company_id, subscription_type, transaction_id]
+    );
+
+    console.log("Subscription created successfully");
+    res.status(201).json({ message: "Subscription successful" });
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// api to check if the person is subscribed or not
+app.post("/api/isSubscription", async (req, res) => {
+  const { sub, company_id, subscription_type } = req.body;
+
+  try {
+
+    // Step 1: Get user_id from google_id
+    const userResult = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.json({ isSubscribed: false });
+    }
+
+    const user_id = userResult.rows[0].user_id;
+
+    // Step 2: Check subscription in user_subscriptions table
+    const subscriptionResult = await pool.query(
+      `SELECT id FROM user_subscriptions 
+       WHERE user_id = $1 
+       AND company_id = $2 
+       AND subscription_type = $3`,
+      [user_id, company_id, subscription_type]
+    );
+
+    // Step 3: Return true if exists
+    if (subscriptionResult.rows.length > 0) {
+      return res.json({ isSubscribed: true });
+    }
+
+    res.json({ isSubscribed: false });
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 
 app.listen(PORT, () => {
