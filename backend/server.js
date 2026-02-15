@@ -92,18 +92,23 @@ app.post("/api/subscribed_status_call", async (req, res) => {
 
 app.post("/api/makeSubscription", async (req, res) => {
   const {
-    user_id,
+    sub,
     company_id,
     subscription_type,
     transaction_id
   } = req.body;
 
   try {
-    user_id = await pool.query(
-      `SELECT user_id FROM users 
-       WHERE google_id = $1`,
-      [user_id]
+    const userResult = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
     );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user_id = userResult.rows[0].user_id;
     // 1️⃣ Check if already subscribed
     const existingSubscription = await pool.query(
       `SELECT id FROM user_subscriptions 
