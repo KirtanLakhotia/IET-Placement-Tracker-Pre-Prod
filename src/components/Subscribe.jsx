@@ -9,44 +9,114 @@ export default function Subscribe() {
     (item) => String(item.id) === String(id)
   );
 
+  // const handlePayment = async () => {
+  //   const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  //   if (!storedUser) {
+  //     navigate("/login");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch(
+  //       "http://localhost:5000/api/makeSubscription",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           sub: storedUser.sub,
+  //           company_id: id,
+  //           subscription_type: type,
+  //         }),
+  //       }
+  //     );
+
+  //     const data = await response.json();
+  //     console.log("Subscription response:", data);
+
+  //     // After successful subscription
+  //     if (type === "pyq") {
+  //       navigate(`/company/${id}/pyq`);
+  //     } else {
+  //       navigate(`/company/${id}/call`);
+  //     }
+
+  //   } catch (error) {
+  //     console.error("Payment Error:", error);
+  //   }
+  // };
+
+
   const handlePayment = async () => {
+
     const storedUser = JSON.parse(localStorage.getItem("user"));
 
     if (!storedUser) {
       navigate("/login");
       return;
     }
+  const response = await fetch("http://localhost:5000/api/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      company_id: 1,
+      package_type: "pyq"
+    })
+  });
 
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/makeSubscription",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            sub: storedUser.sub,
-            company_id: id,
-            subscription_type: type,
-          }),
-        }
-      );
+  const data = await response.json();
 
-      const data = await response.json();
-      console.log("Subscription response:", data);
+  openRazorpay(data);
+};
 
-      // After successful subscription
-      if (type === "pyq") {
-        navigate(`/company/${id}/pyq`);
-      } else {
-        navigate(`/company/${id}/call`);
-      }
+const openRazorpay = (data) => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    } catch (error) {
-      console.error("Payment Error:", error);
+    if (!storedUser) {
+      navigate("/login");
+      return;
     }
+  const options = {
+    key: data.key,
+    amount: data.amount,
+    currency: data.currency,
+    order_id: data.orderId,
+
+    handler: async function (response) {
+
+      const verifyRes = await fetch("http://localhost:5000/api/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          package_id: data.package_id,
+          sub: storedUser.sub,
+          subscription_type: "pyq",
+          company_id: 1
+        })
+      });
+
+      const result = await verifyRes.json();
+      console.log("Verification result:", result);
+      if (verifyRes.ok) {
+        // ✅ redirect after backend confirms
+        navigate(`/company/${1}/pyq`);
+      } else {
+        alert("Payment verification failed");
+      }
+    }
+
   };
+
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+};
+
+
 
   if (!company) {
     return (

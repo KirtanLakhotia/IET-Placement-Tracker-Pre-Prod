@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
 
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
 
 const app = express();
 const PORT = 5000;
@@ -12,6 +15,12 @@ app.use(cors());
 
 // Allow JSON data
 app.use(express.json());
+
+// razorpay instance
+const razorpay = new Razorpay({
+  key_id: 'rzp_test_SHKfz1fL2NiSh3',
+  key_secret: 'g0Rb9MwFQfbVHxgXrAhYVzBl'
+});
 
 // Test route
 app.get("/", (req, res) => {
@@ -180,6 +189,99 @@ app.post("/api/isSubscription", async (req, res) => {
   }
 });
 
+// for the razor pay order creation
+app.post('/api/create-order', async (req, res) => {
+  const { company_id, package_type } = req.body;
+
+  if (!company_id || !package_type) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  try {
+    // 1️⃣ Get package from DB
+    const result = await pool.query(
+      `SELECT package_id, amount, package_type 
+       FROM packages 
+       WHERE company_id = $1 AND package_type = $2 AND is_active = true`,
+      [company_id, package_type]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: "Invalid package" });
+    }
+
+    const packageData = result.rows[0];
+
+    // 2️⃣ Create Razorpay order
+    const options = {
+      amount: packageData.amount * 100, // convert to paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    // 3️⃣ Send order details to frontend
+    res.json({
+      orderId: order.id,
+      amount: packageData.amount * 100,
+      currency: "INR",
+      key: 'rzp_test_SHKfz1fL2NiSh3',
+      package_id: packageData.package_id
+    });
+
+  } catch (err) {
+    console.error("Order creation error:", err);
+    res.status(500).json({ error: "Order creation failed" });
+  }
+});
+
+
+app.post("/api/verify-payment", async (req, res) => {
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    package_id,
+    sub,
+    subscription_type,
+    company_id
+  } = req.body;
+
+  const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", "g0Rb9MwFQfbVHxgXrAhYVzBl")
+    .update(body.toString())
+    .digest("hex");
+
+  if (expectedSignature !== razorpay_signature) {
+    return res.status(400).json({ error: "Invalid signature" });
+  }
+
+  try {
+    // 1️⃣ Get user_id
+    const user = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
+    );
+
+    const user_id = user.rows[0].user_id;
+
+    // 2️⃣ Insert subscription
+    await pool.query(
+      `INSERT INTO user_subscriptions
+       (user_id, id, transaction_id, subscription_type, company_id)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [user_id, package_id, razorpay_payment_id, subscription_type, company_id]
+    );
+
+    res.json({ message: "Payment verified & subscription added" });
+
+  } catch (err) {
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
