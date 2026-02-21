@@ -61,8 +61,8 @@ export default function Subscribe() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      company_id: 1,
-      package_type: "pyq"
+      company_id: company.id,
+      package_type: type
     })
   });
 

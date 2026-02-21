@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useParams, useNavigate } from 'react-router-dom'
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 import { setFilter, clearFilters, setSort } from '../redux/filterSlice'
 import { ChevronUp, ChevronDown, Sparkles, ArrowLeft, ArrowRight, ChevronsLeftRightEllipsis } from 'lucide-react'
@@ -166,9 +167,9 @@ export default function BatchPage() {
         <hr className="mb-3" />
 
         <div className="flex flex-col gap-2 text-sm">
-          <a href="/subscriptions" className="text-blue-600">
+          <Link to="/subscriptions" className="text-blue-600">
             My Subscriptions
-          </a>
+          </Link>
 
           <a href="/transactions" className="text-blue-600">
             My Transactions

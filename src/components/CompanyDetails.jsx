@@ -55,7 +55,7 @@ export default function CompanyDetails() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/subscribed_status_pyq",
+        "http://localhost:5000/api/isSubscription",
         {
           method: "POST",
           headers: {
@@ -63,6 +63,8 @@ export default function CompanyDetails() {
           },
           body: JSON.stringify({
             sub: String(storedUser.sub),
+            company_id: company.id,
+            subscription_type: "call",
           }),
         }
       );

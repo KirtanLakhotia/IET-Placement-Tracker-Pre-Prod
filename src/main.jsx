@@ -9,6 +9,7 @@ import CompanyDetails from './components/CompanyDetails'
 import CompanyPYQ from './components/CompanyPYQ'
 import CompanyCall from './components/CompanyCall'
 import Subscribe from "./components/Subscribe";
+import MySubscriptions from './components/MySubsciptions'
 import './index.css'
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/company/:id/pyq" element={<CompanyPYQ />} />
             <Route path="/company/:id/call" element={<CompanyCall />} />
             <Route path="/subscribe/:id/:type" element={<Subscribe />} />
+            <Route path="/subscriptions" element={<MySubscriptions />} />
 
           </Routes>
         </Router>
