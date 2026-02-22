@@ -21,8 +21,8 @@ export default function BatchPage() {
   const dispatch = useDispatch()
   const filters = useSelector((state) => state.filter.filters)
   const sort = useSelector((state) => state.filter.sort)
- const data = data2026
-const visibleColumns = ['id', 'Date', 'Company','Eligible Batches', 'CGPA','CTC (in LPA)','Compensation in Internship'];
+  const data = data2026
+  const visibleColumns = ['id', 'Date', 'Company','Eligible Batches', 'CGPA','CTC (in LPA)','Compensation in Internship'];
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCompany, setSelectedCompany] = useState(null)

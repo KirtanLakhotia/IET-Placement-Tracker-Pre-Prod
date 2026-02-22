@@ -254,6 +254,44 @@ app.post("/api/verify-payment", async (req, res) => {
   }
 });
 
+
+// test tanay code 
+app.post("/api/getUserSubscriptions", async (req, res) => {
+  const { sub } = req.body;
+  console.log(sub);
+  console.log(typeof(sub));
+  try {
+    // Get user_id from google_id
+    const userResult = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.json({ subscriptions: [] });
+    }
+
+    const user_id = userResult.rows[0].user_id;
+
+    // Get all subscriptions for this user
+    const subscriptionResult = await pool.query(
+      `SELECT company_id, subscription_type
+       FROM user_subscriptions
+       WHERE user_id = $1`,
+      [user_id]
+    );
+
+    res.json({
+      subscriptions: subscriptionResult.rows
+    });
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
