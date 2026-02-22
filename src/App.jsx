@@ -42,6 +42,22 @@ export default function App() {
 >
   Company-wise IET DAVV Indore Placement Data — 2026 Batch Onwards
 </motion.p>
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.4 }}
+  whileHover={{ scale: 1.02 }}
+  className="mt-6 cursor-pointer bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20 
+             border border-purple-400/30 
+             px-6 py-3 rounded-xl backdrop-blur-md 
+             shadow-lg shadow-purple-500/10 
+             flex items-center justify-center gap-3"
+>
+  <span className="text-sm md:text-base font-medium text-purple-200">
+    🔥 NEW: 1-on-1 Placement Consultation with 2026 Senior
+  </span>
+  <ArrowUpRight className="w-4 h-4 text-purple-300" />
+</motion.div>
                     
             {/* Improved Batch Links */}
             <div className="mt-8 md:mt-12 w-full flex flex-col sm:flex-row items-center gap-5 justify-center">
