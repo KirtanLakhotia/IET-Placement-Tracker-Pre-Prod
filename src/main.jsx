@@ -12,6 +12,7 @@ import Subscribe from "./components/Subscribe";
 import MySubscriptions from './components/MySubsciptions'
 import './index.css'
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import SubscribeConsultation from './components/SubscribeConsultation'
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -26,7 +27,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/company/:id/pyq" element={<CompanyPYQ />} />
             <Route path="/company/:id/call" element={<CompanyCall />} />
             <Route path="/subscribe/:id/:type" element={<Subscribe />} />
-            <Route path="/subscriptions" element={<MySubscriptions />} />
+            <Route path="/subscriptions" element={<MySubscriptions />} /> 
+            <Route path="/subscribe-consultation" element={<SubscribeConsultation />} /> 
 
           </Routes>
         </Router>

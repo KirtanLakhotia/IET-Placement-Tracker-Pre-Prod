@@ -127,9 +127,47 @@ export default function BatchPage() {
       if (data.isSubscribed) {
         navigate("/subscriptions");
       } else {
-        navigate(`/subscribe/${1}/pyq`);
+        navigate(`/subscribe-consultation`);
       }
 
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+const checkConsultationAndNavigate = async () => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  if (!storedUser) {
+    navigate("/login");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/isSubscription",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sub: String(storedUser.sub),
+          company_id: 100,   // default id for consultation
+          subscription_type: "consultation",
+          transaction_id: "FREE_CONSULT",
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.isSubscribed) {
+      navigate("/subscriptions");
+    } else {
+      navigate("/subscribe-consultation");
+    }
 
   } catch (error) {
     console.error("Error:", error);
@@ -175,7 +213,7 @@ export default function BatchPage() {
     </button>
 
     <button
-      onClick={() => handleConsultationClick()}
+      onClick={handleConsultationClick}
       className="bg-purple-600 px-4 py-2 rounded-md text-sm hover:bg-purple-700 transition"
     >
       1:1 Consultation
