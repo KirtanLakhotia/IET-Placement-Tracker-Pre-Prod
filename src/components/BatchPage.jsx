@@ -7,7 +7,7 @@ import { ChevronUp, ChevronDown, Sparkles, ArrowLeft } from 'lucide-react'
 import data2026 from '../data/2026.json'
 import Header from './Header'
 import Modal from './Modal'
-import { useState,useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Footer from './Footer'
 import { formatNumber } from '../utils/formatNumber'; // Import the utility function
 import { GoogleLogin } from "@react-oauth/google";
@@ -27,6 +27,7 @@ export default function BatchPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCompany, setSelectedCompany] = useState(null)
   const [showProfile, setShowProfile] = useState(false);
+  const profileMenuRef = useRef(null)
 
   const navigate = useNavigate()
 
@@ -49,6 +50,28 @@ export default function BatchPage() {
     setUser(JSON.parse(storedUser));
   }
 }, []);
+
+  useEffect(() => {
+    if (!showProfile) return
+
+    const onPointerDown = (e) => {
+      const el = profileMenuRef.current
+      if (!el) return
+      if (el.contains(e.target)) return
+      setShowProfile(false)
+    }
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setShowProfile(false)
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [showProfile])
 
 
   // Helper function to compare values for sorting
@@ -203,7 +226,7 @@ const checkConsultationAndNavigate = async () => {
 
  {/* button */}
       {user ? (
-  <div className="flex gap-3">
+  <div className="relative flex gap-3" ref={profileMenuRef}>
     {/* My Profile Button */}
     <button
       onClick={() => setShowProfile(!showProfile)}
