@@ -20,7 +20,8 @@ export default function MySubscriptions() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              user_id: storedUser.sub,
+              sub: String(storedUser.sub),
+              
             }),
           }
         );
@@ -42,6 +43,10 @@ export default function MySubscriptions() {
   const callSubs = subscriptions.filter(
     (sub) => sub.subscription_type === "call"
   );
+
+  const consultationSubs = subscriptions.filter(
+  (sub) => sub.subscription_type === "consultation"
+);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-10">
@@ -108,6 +113,42 @@ export default function MySubscriptions() {
           ))
         )}
       </div>
+
+      {/* Consultation Section */}
+<div className="mt-10">
+  <h2 className="text-2xl font-bold mb-4 text-blue-400">
+    Consultation
+  </h2>
+
+  {consultationSubs.length === 0 ? (
+    <p className="text-gray-400">No consultation booked yet.</p>
+  ) : (
+    <div className="space-y-4">
+      {consultationSubs.map((sub) => (
+        <div
+          key={sub.subscription_id}
+          className="bg-gray-900 p-4 rounded-lg flex justify-between items-center"
+        >
+          <div>
+            <h3 className="text-lg font-semibold">
+              1:1 Consultation
+            </h3>
+            <p className="text-sm text-gray-400">
+              Transaction ID: {sub.transaction_id}
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate("/consultation")}
+            className="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-md transition"
+          >
+            Open
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
     </div>
   );
 }

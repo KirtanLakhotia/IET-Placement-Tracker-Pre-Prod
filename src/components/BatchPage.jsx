@@ -100,6 +100,35 @@ const visibleColumns = ['id', 'Date', 'Company','Eligible Batches', 'CGPA','CTC 
     'S.No.', 'Date', 'Company', 'CGPA'
   ]
 
+  const handleConsultationClick = async () => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  if (!storedUser) {
+    navigate("/login");
+    return;
+  }
+
+  try {
+    await fetch("http://localhost:5000/api/verify-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sub: String(storedUser.sub),
+        subscription_type: "consultation",
+        company_id: 100,
+        isFree: true // 👈 THIS is the trick
+      }),
+    });
+
+    navigate("/subscriptions");
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
   return (
     <div className="font-['Poppins'] min-h-screen bg-gradient-to-br from-gray-950 via-blue-950 to-gray-950 text-white flex flex-col relative">
       <div className='flex flex-row justify-start gap-5 md:gap-0 md:justify-between items-center p-4 md:p-8'>
@@ -129,13 +158,20 @@ const visibleColumns = ['id', 'Date', 'Company','Eligible Batches', 'CGPA','CTC 
 
  {/* button */}
       {user ? (
-  <div className="relative">
+  <div className="flex gap-3">
     {/* My Profile Button */}
     <button
       onClick={() => setShowProfile(!showProfile)}
-      className="bg-blue-600 px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition"
+      className="bg-orange-600 px-4 py-2 rounded-md text-sm hover:bg-orange-700 transition"
     >
       My Profile
+    </button>
+
+    <button
+      onClick={() => handleConsultationClick()}
+      className="bg-purple-600 px-4 py-2 rounded-md text-sm hover:bg-purple-700 transition"
+    >
+      1:1 Consultation
     </button>
 
     {/* Slider / Dropdown Panel */}

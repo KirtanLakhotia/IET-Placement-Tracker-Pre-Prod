@@ -15,7 +15,7 @@ app.use(cors());
 
 // Allow JSON data
 app.use(express.json());
-
+console.log("🔥 THIS SERVER FILE IS RUNNING 🔥");
 // razorpay instance
 const razorpay = new Razorpay({
   key_id: 'rzp_test_SHKfz1fL2NiSh3',
@@ -160,6 +160,41 @@ app.post("/api/isSubscription", async (req, res) => {
   }
 });
 
+app.post("/api/getUserSubscriptions", async (req, res) => {
+  const { sub } = req.body;
+  console.log(sub);
+  console.log(typeof(sub));
+  try {
+    // Get user_id from google_id
+    const userResult = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.json({ subscriptions: [] });
+    }
+
+    const user_id = userResult.rows[0].user_id;
+
+    // Get all subscriptions for this user
+    const subscriptionResult = await pool.query(
+      `SELECT company_id, subscription_type
+       FROM user_subscriptions
+       WHERE user_id = $1`,
+      [user_id]
+    );
+
+    res.json({
+      subscriptions: subscriptionResult.rows
+    });
+
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
 // for the razor pay order creation
 app.post('/api/create-order', async (req, res) => {
   const { company_id, package_type } = req.body;
@@ -216,20 +251,26 @@ app.post("/api/verify-payment", async (req, res) => {
     package_id,
     sub,
     subscription_type,
-    company_id
+    company_id,
+    isFree
   } = req.body;
+console.log("Incoming body:", req.body);
+console.log("Google ID received:", sub);
+  try {
+    // 🔹 Always get user_id first
+    const user = await pool.query(
+      "SELECT user_id FROM users WHERE google_id = $1",
+      [sub]
+    );
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
+    if (user.rows.length === 0) {
+      return res.status(400).json({ error: "User not found" });
+    }
 
-  const expectedSignature = crypto
-    .createHmac("sha256", "g0Rb9MwFQfbVHxgXrAhYVzBl")
-    .update(body.toString())
-    .digest("hex");
+    const user_id = user.rows[0].user_id;
 
-  if (expectedSignature !== razorpay_signature) {
-    return res.status(400).json({ error: "Invalid signature" });
-  }
-
+    // 🔹 FREE CONSULTATION FLOW
+    if (isFree === true) {
   try {
     // 1️⃣ Get user_id
     const user = await pool.query(
@@ -237,9 +278,52 @@ app.post("/api/verify-payment", async (req, res) => {
       [sub]
     );
 
+    if (user.rows.length === 0) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
     const user_id = user.rows[0].user_id;
 
-    // 2️⃣ Insert subscription
+    // 2️⃣ Check if consultation already exists
+    const existing = await pool.query(
+      `SELECT subscription_id 
+       FROM user_subscriptions 
+       WHERE user_id = $1 
+       AND subscription_type = 'consultation'`,
+      [user_id]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.json({ message: "Consultation already booked" });
+    }
+
+    // 3️⃣ Insert only if not exists
+    await pool.query(
+      `INSERT INTO user_subscriptions
+       (user_id, transaction_id, subscription_type, company_id)
+       VALUES ($1, $2, $3, $4)`,
+      [user_id, "FREE_CONSULT", "consultation", company_id]
+    );
+
+    return res.json({ message: "Free consultation added" });
+
+  } catch (err) {
+    return res.status(500).json({ error: "Database error" });
+  }
+}
+
+    // 🔹 PAID FLOW
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", "g0Rb9MwFQfbVHxgXrAhYVzBl")
+      .update(body.toString())
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ error: "Invalid signature" });
+    }
+
     await pool.query(
       `INSERT INTO user_subscriptions
        (user_id, transaction_id, subscription_type, company_id)
@@ -250,6 +334,7 @@ app.post("/api/verify-payment", async (req, res) => {
     res.json({ message: "Payment verified & subscription added" });
 
   } catch (err) {
+    console.error("Database error:", err);
     res.status(500).json({ error: "Database error" });
   }
 });
