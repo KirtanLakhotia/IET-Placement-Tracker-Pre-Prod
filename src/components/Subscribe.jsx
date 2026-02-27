@@ -57,7 +57,7 @@ export default function Subscribe() {
       navigate("/login");
       return;
     }
-  const response = await fetch("http://localhost:5000/api/create-order", {
+  const response = await fetch("https://iet-placement-tracker-pre-prod.onrender.com/api/create-order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -86,7 +86,7 @@ const openRazorpay = (data) => {
 
     handler: async function (response) {
 
-      const verifyRes = await fetch("http://localhost:5000/api/verify-payment", {
+      const verifyRes = await fetch("https://iet-placement-tracker-pre-prod.onrender.com/api/verify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

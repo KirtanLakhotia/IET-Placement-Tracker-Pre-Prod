@@ -29,7 +29,7 @@
 
         try {
           const response = await fetch(
-            "http://localhost:5000/api/isSubscription",
+            "https://iet-placement-tracker-pre-prod.onrender.com/api/isSubscription",
             {
               method: "POST",
               headers: {
@@ -75,7 +75,7 @@
 
         try {
           const response = await fetch(
-            "http://localhost:5000/api/isSubscription",
+            "https://iet-placement-tracker-pre-prod.onrender.com/api/isSubscription",
             {
               method: "POST",
               headers: {

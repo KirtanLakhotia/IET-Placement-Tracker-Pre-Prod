@@ -13,7 +13,7 @@ export default function SubscribeConsultation() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/makeSubscription",
+        "https://iet-placement-tracker-pre-prod.onrender.com/api/makeSubscription",
         {
           method: "POST",
           headers: {

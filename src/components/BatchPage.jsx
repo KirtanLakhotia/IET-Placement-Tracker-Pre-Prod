@@ -147,7 +147,7 @@ export default function BatchPage() {
 }
 
   try {
-   const response = await fetch("http://localhost:5000/api/isSubscription", {
+   const response = await fetch("https://iet-placement-tracker-pre-prod.onrender.com/api/isSubscription", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -184,7 +184,7 @@ const checkConsultationAndNavigate = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost:5000/api/isSubscription",
+      "https://iet-placement-tracker-pre-prod.onrender.com/api/isSubscription",
       {
         method: "POST",
         headers: {
@@ -520,7 +520,7 @@ const checkConsultationAndNavigate = async () => {
 } 
 
 function senduserdataToBackend(userdata) {
-  fetch('http://localhost:5000/api/data', {
+  fetch('https://iet-placement-tracker-pre-prod.onrender.com/api/data', {
     method: 'POST',  
     headers: {
       'Content-Type': 'application/json'
