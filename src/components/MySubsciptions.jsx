@@ -15,7 +15,7 @@ export default function MySubscriptions() {
 
       try {
         const response = await fetch(
-          "https://iet-placement-tracker-pre-prod.onrender.com/api/getUserSubscriptions",
+          "https://iet-placement-tracker-pre-prod.railway.internal/api/getUserSubscriptions",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
