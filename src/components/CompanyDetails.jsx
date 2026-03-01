@@ -6,11 +6,14 @@
       const { id } = useParams();
       const navigate = useNavigate();
       const [toast, setToast] = useState(null);
+      const [loading, setLoading] = useState(false)
+
       const company = data2026.find(
         (item) => String(item.id) === String(id)
       );
 
       const checkSubscriptionAndNavigate_PYQ = async () => {
+        setLoading(true);
         const storedUser = JSON.parse(localStorage.getItem("user"));
 
         // if (!storedUser) {
@@ -24,6 +27,7 @@
               setToast(null);
             }, 2000);
 
+            setLoading(false);
             return;
           }
 
@@ -52,10 +56,13 @@
           }
         } catch (error) {
           console.error("Error:", error);
+        } finally {
+          setLoading(false);
         }
       };
 
       const checkSubscriptionAndNavigate_Call = async () => {
+        setLoading(true);
         const storedUser = JSON.parse(localStorage.getItem("user"));
 
         // if (!storedUser) {
@@ -69,7 +76,7 @@
             setTimeout(() => {
               setToast(null);
             }, 2000);
-
+            setLoading(false);
             return;
           }
 
@@ -98,6 +105,8 @@
           }
         } catch (error) {
           console.error("Error:", error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -176,6 +185,12 @@
     <div className="bg-red-600 text-white px-8 py-4 rounded-xl shadow-2xl text-base font-medium min-w-[280px] text-center transition-all duration-300">
       {toast}
     </div>
+  </div>
+)}
+{/* ✅ loader HERE */}
+      {loading && (
+  <div className="fixed inset-0 z-[999] bg-black/50 backdrop-blur-sm flex items-center justify-center">
+    <div className="h-10 w-10 rounded-full border-4 border-white/30 border-t-white animate-spin" />
   </div>
 )}
         </div>

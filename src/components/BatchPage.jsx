@@ -33,7 +33,8 @@ export default function BatchPage() {
   const profileMenuRef = useRef(null)
 
   const [toast, setToast] = useState(null);
-  
+  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate()
 
   const handleFilterChange = (field, value) => {
@@ -129,6 +130,7 @@ export default function BatchPage() {
   ]
 
   const handleConsultationClick = async () => {
+     setLoading(true) ;
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
   // if (!storedUser) {
@@ -136,15 +138,15 @@ export default function BatchPage() {
   //   return;
   // }
 
-  if (!storedUser) {
-  setToast("Please login first");
-  
-  setTimeout(() => {
-    setToast(null);
-  }, 2000);
-
-  return;
-}
+      if (!storedUser) {
+      setToast("Please login first");
+      
+      setTimeout(() => {
+        setToast(null);
+      }, 2000);
+      setLoading(false); // add this
+      return;
+    }
 
   try {
    const response = await fetch("https://iet-placement-tracker-pre-prod-production.up.railway.app/api/isSubscription", {
@@ -171,7 +173,10 @@ export default function BatchPage() {
 
   } catch (error) {
     console.error("Error:", error);
+  }finally {
+    setLoading(false)
   }
+
 };
 
 const checkConsultationAndNavigate = async () => {
@@ -314,7 +319,8 @@ const checkConsultationAndNavigate = async () => {
 
     <button
       onClick={handleConsultationClick}
-      className="bg-purple-600 px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm hover:bg-purple-700 transition whitespace-nowrap"
+      disabled={loading}
+      className="bg-purple-600 px-3 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm hover:bg-purple-700 transition whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
     >
       1:1 Consultation
     </button>
@@ -513,9 +519,14 @@ const checkConsultationAndNavigate = async () => {
       </main>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} companyDetails={selectedCompany || {}} />
-
+      {loading && (
+  <div className="fixed inset-0 z-[999] bg-black/50 backdrop-blur-sm flex items-center justify-center">
+    <div className="h-10 w-10 rounded-full border-4 border-white/30 border-t-white animate-spin" />
+  </div>
+)}
       <Footer />
     </div>
+    
   )
 } 
 
