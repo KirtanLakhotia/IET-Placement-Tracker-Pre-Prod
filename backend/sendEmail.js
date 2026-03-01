@@ -4,26 +4,26 @@ const sendSubscriptionEmail = async (toEmail, userName) => {
   try {
     // use this when using the rene paid service
 
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.EMAIL_USER,      // your email
-    //     pass: process.env.EMAIL_PASS,      // app password
-    //   },
-    // });
-    // fore rene free service, this configuration works
-const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,            // VERY IMPORTANT
-      secure: false,        // false for 587
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
+        user: process.env.EMAIL_USER,      // your email
+        pass: process.env.EMAIL_PASS,      // app password
       },
     });
+    // fore rene free service, this configuration works
+// const transporter = nodemailer.createTransport({
+//       host: "smtp.gmail.com",
+//       port: 587,            // VERY IMPORTANT
+//       secure: false,        // false for 587
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//       },
+//       tls: {
+//         rejectUnauthorized: false,
+//       },
+//     });
 
 const mailOptions = {
   from: `"IET Placement Tracker" <${process.env.EMAIL_USER}>`,
