@@ -129,13 +129,19 @@ export default function MySubscriptions() {
           key={sub.subscription_id}
           className="bg-gray-800 p-5 rounded-lg mb-4 flex justify-between items-center"
         >
-          <div>
-            <h3 className="text-lg">
+          <div className="space-y-1">
+            <h3 className="text-lg font-semibold text-white">
               1:1 Consultation
             </h3>
             {/* <p className="text-sm text-gray-400">
               Transaction ID: {sub.transaction_id}
             </p> */}
+            <p className="text-sm text-emerald-300">
+              Consultation request received.
+            </p>
+            <p className="text-sm text-gray-300">
+              Slot details will be shared by email shortly.
+            </p>
           </div>
 
           <button

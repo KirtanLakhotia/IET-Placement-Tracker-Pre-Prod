@@ -2,6 +2,8 @@ const nodemailer = require("nodemailer");
 
 const sendSubscriptionEmail = async (toEmail, userName) => {
   try {
+    // use this when using the rene paid service
+
     // const transporter = nodemailer.createTransport({
     //   service: "gmail",
     //   auth: {
@@ -9,6 +11,7 @@ const sendSubscriptionEmail = async (toEmail, userName) => {
     //     pass: process.env.EMAIL_PASS,      // app password
     //   },
     // });
+    // fore rene free service, this configuration works
 const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,            // VERY IMPORTANT

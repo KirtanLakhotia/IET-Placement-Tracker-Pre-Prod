@@ -149,7 +149,7 @@ const openRazorpay = (data) => {
           onClick={handlePayment}
           className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg text-lg font-medium transition duration-300 shadow-lg hover:shadow-blue-500/40"
         >
-          Pay Now
+          Unlock
         </button>
         <h1 className="text-3xl">Coming Soon !!!</h1>
 

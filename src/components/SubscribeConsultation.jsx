@@ -88,12 +88,10 @@ The session duration will be around 20–25 minutes.
 
 This session is completely free of cost (for now).
 <br></br><br></br>
-<h1 className="text-2xl">📩 Need Help?</h1>br
-
+<h1 className="text-2xl">📩 Need Help?</h1> 
 For any queries, you can reach out to us at:
 ietplacementtracker@gmail.com
-
-points that has to be shown at the consultation page</h3>
+</h3>
       </div>
 
     </div>
