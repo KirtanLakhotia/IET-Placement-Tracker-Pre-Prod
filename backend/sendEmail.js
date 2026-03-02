@@ -88,7 +88,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendSubscriptionEmail = async (toEmail, userName) => {
   try {
     await resend.emails.send({
-      from: "IET Placement Tracker <onboarding@resend.dev>",
+      from: "onboarding@resend.dev",
       to: toEmail,
       subject: "Consultation Booking Confirmed – IET Placement Tracker",
       html: `
