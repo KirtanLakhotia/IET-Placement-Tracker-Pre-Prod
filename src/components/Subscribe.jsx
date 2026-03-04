@@ -19,7 +19,7 @@ export default function Subscribe() {
 
   //   try {
   //     const response = await fetch(
-  //       "http://localhost:5000/api/makeSubscription",
+  //       "https://iet-placement-tracker-pre-prod-production.up.railway.app/api/makeSubscription",
   //       {
   //         method: "POST",
   //         headers: {
