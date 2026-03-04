@@ -91,13 +91,15 @@ app.post("/api/makeSubscription", async (req, res) => {
     const user_id = userResult.rows[0].user_id;
     const email = userResult.rows[0].email;
     const name = userResult.rows[0].name;
+    const isActive = true; // Set subscription as active by default
     // 1️⃣ Check if already subscribed
     const existingSubscription = await pool.query(
       `SELECT subscription_id FROM user_subscriptions 
        WHERE user_id = $1 
        AND company_id = $2 
-       AND subscription_type = $3`,
-      [user_id, company_id, subscription_type]
+       AND subscription_type = $3
+       AND is_active = $4`,
+      [user_id, company_id, subscription_type, isActive]
     );
 
     if (existingSubscription.rows.length > 0) {
@@ -141,14 +143,15 @@ app.post("/api/isSubscription", async (req, res) => {
     }
 
     const user_id = userResult.rows[0].user_id;
-
+    const isActive = true; // Only consider active subscriptions
     // Step 2: Check subscription in user_subscriptions table
     const subscriptionResult = await pool.query(
       `SELECT subscription_id ,is_active FROM user_subscriptions 
        WHERE user_id = $1 
        AND company_id = $2 
-       AND subscription_type = $3`,
-      [user_id, company_id, subscription_type]
+       AND subscription_type = $3
+       AND is_active = $4`,
+      [user_id, company_id, subscription_type, isActive]
     );
 
     // Step 3: Return true if exists
@@ -180,13 +183,14 @@ app.post("/api/getUserSubscriptions", async (req, res) => {
     }
 
     const user_id = userResult.rows[0].user_id;
-
+    const isActive = true; // Only fetch active subscriptions
     // Get all subscriptions for this user
     const subscriptionResult = await pool.query(
       `SELECT company_id, subscription_type
        FROM user_subscriptions
-       WHERE user_id = $1`,
-      [user_id]
+       WHERE user_id = $1
+       AND is_active = $2`,
+      [user_id, isActive]
     );
 
     res.json({
